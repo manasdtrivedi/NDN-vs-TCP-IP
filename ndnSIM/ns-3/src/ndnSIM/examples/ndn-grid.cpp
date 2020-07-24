@@ -28,6 +28,25 @@
 
 namespace ns3 {
 
+  class PcapWriter {
+
+    public:
+
+    PcapWriter(const std::string& file) {
+      PcapHelper helper;
+      m_pcap = helper.CreateFile(file, std::ios::out, PcapHelper::DLT_PPP);
+  	}
+
+    void TracePacket(Ptr<const Packet> packet) {
+      static PppHeader pppHeader;
+      pppHeader.SetProtocol(0x0077);
+      m_pcap->Write(Simulator::Now(), pppHeader, packet);
+    }
+
+	private:
+  	  Ptr<PcapFileWrapper> m_pcap;
+  };
+
 /**
  * This scenario simulates a grid topology (using PointToPointGrid module)
  *
@@ -66,7 +85,7 @@ main(int argc, char* argv[])
   cmd.AddValue ("animFile",  "File Name for Animation Output", animFile);
   cmd.Parse(argc, argv);
 
-  // Creating 3x3 topology
+  // Creating 5x5 topology
   PointToPointHelper p2p;
   PointToPointGridHelper grid(5, 5, p2p);
   grid.BoundingBox(100, 100, 200, 200);
@@ -90,11 +109,13 @@ main(int argc, char* argv[])
   // Install NDN applications
   std::string prefix = "/prefix";
 
+  // Consumer
   ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
   consumerHelper.SetPrefix(prefix);
   consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
   consumerHelper.Install(consumerNodes);
 
+  // Producer
   ndn::AppHelper producerHelper("ns3::ndn::Producer");
   producerHelper.SetPrefix(prefix);
   producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
@@ -112,7 +133,21 @@ main(int argc, char* argv[])
   // Create the animation object and configure for specified output
   AnimationInterface anim (animFile);
 
+  PcapWriter trace("ndn-grid.pcap");
+  Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/MacTx", MakeCallback(&PcapWriter::TracePacket, &trace));
+
+  
   Simulator::Stop(Seconds(20.0));
+
+
+  ndn::L3RateTracer::InstallAll("rate-trace.txt", Seconds(1.0));
+  L2RateTracer::InstallAll("drop-trace.txt", Seconds(0.5));
+  //CsTracer::InstallAll("cs-trace.txt", Seconds(1));
+  ndn::AppDelayTracer::InstallAll("app-delays-trace.txt");
+
+  // rate-trace.txt will be used by rate-graph.R to generate Rplots.pdf
+  // To generate the pdf, run this: Rscript src/ndnSIM/examples/graphs/rate-graph.R
+
 
   Simulator::Run();
   Simulator::Destroy();
