@@ -25,6 +25,7 @@
 #include "ns3/netanim-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/point-to-point-layout-module.h"
+#include "ns3/pcap-file.h"
 
 using namespace ns3;
 
@@ -85,7 +86,11 @@ int main (int argc, char *argv[])
 
   // Set up the actual simulation
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-
+  
+  AsciiTraceHelper ascii;
+  pointToPoint.EnableAsciiAll (ascii.CreateFileStream ("myfirst.tr"));
+  pointToPoint.EnablePcapAll ("myfirst");
+  
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
