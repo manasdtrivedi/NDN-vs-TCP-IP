@@ -13,13 +13,13 @@ Wireshark - Packet analyzer
 R - Language and environment for statistical computing and graphics
 
 ## Methodology:
-Phase 1: Understanding TCP/IP and NDN concepts
+Phase 1: Understanding TCP/IP and NDN concepts  
 TCP/IP concepts were covered by referring [1]. NDN concepts were covered by referring [2]. Numerous meetings were held between the mentors and the team members to clarify doubts in these concepts.
 
-Phase 2: Attempt to work on NDN-RTC
+Phase 2: Attempt to work on NDN-RTC  
 The ideas involved in the development of NDN-RTC were covered by studying [3]. Attempts were then made to install the NDN-RTC library. The process was tedious, and required hours to download. Due to network issues, the download did not complete. It was then decided to move forward with ndnSIM.
 
-Phase 3: Drawing comparisons between NDN and TCP/IP
+Phase 3: Drawing comparisons between NDN and TCP/IP  
 ndnSIM was downloaded, compiled, and run by following [4]. NetAnim was installed and configured by following [5]. Different NDN topologies were studied and run by referring [6]. To contrast between NDN and TCP/IP, both architectures were simulated on the same network topologies, and their performances were compared. This comparison was drawn by generating PCAP files for each simulation, and analyzed using Wireshark. To generate PCAP files, the ‘Simple scenario with pcap dump’ section of [6], and the ‘PCAP Tracing’ section of [7] were referred. Furthermore, plots were generated which showed the variation of the rate (in Kbits/s) of the Interest/Data packets forwarded by each node with time, for the NDN example topologies, using R.
 ## Results:
 The simulations of both architectures on the 5x5 grid topology show a difference in the route taken by the packets in each architecture. Following are the screenshots of the simulations:  
